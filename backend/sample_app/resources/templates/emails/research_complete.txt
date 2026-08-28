@@ -1,0 +1,13 @@
+Hi {{ user.first_name|default:user.username }},
+
+{% if session.session_title %}Your research report "{{ session.session_title }}" is ready.{% else %}Your research report is ready.{% endif %}
+
+{% if session_url %}View your report here:
+{{ session_url }}
+{% else %}Log in to {{ app_name }} to view your report.
+{% endif %}
+
+Thank you for using {{ app_name }}.
+
+---
+{{ app_name }}{% if site_url %} — {{ site_url }}{% endif %}

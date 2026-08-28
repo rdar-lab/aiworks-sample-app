@@ -1,0 +1,37 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*.so
+.Python
+venv
+.venv
+
+# Testing
+.pytest_cache
+.coverage
+htmlcov
+coverage.xml
+coverage.json
+
+# IDE
+.idea
+.vscode
+*.swp
+
+# Docs
+*.md
+LICENSE
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# Storage (bind mount from host)
+storage
+test_storage
+db.sqlite3
+test_db.sqlite3

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <!-- Safari / PWA meta tags -->
+    <meta name="color-scheme" content="dark light">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#020617" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <title>AiWorks Sample App</title>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #020617;
+            overflow-x: hidden;
+            color: #f8fafc;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Safari / iOS compatibility fixes */
+
+        /* Remove blue tap-highlight flash on interactive elements in iOS Safari */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* iOS Safari: prevent auto-zoom when an input/textarea is focused.
+           Safari zooms in when any text input has font-size < 16px.
+           This rule applies only to iOS devices (via -webkit-touch-callout support).
+           The `body` prefix increases specificity over Tailwind utility classes. */
+        @supports (-webkit-touch-callout: none) {
+            body input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):not([type="color"]),
+            body textarea,
+            body select {
+                font-size: 16px;
+            }
+        }
+
+        /* Ensure proper page margins on all pages (including after page breaks) */
+        @page { margin: 20mm; }
+
+        /* Enhanced Print styles */
+        @media print {
+            .no-print { display: none !important; }
+            body { 
+                background: white !important; 
+                color: black !important; 
+                margin: 0 !important;
+                padding: 0mm !important;
+                font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+            }
+            #root { width: 100% !important; }
+            main { padding: 0 !important; width: 100% !important; max-width: none !important; display: block !important; overflow: visible !important; }
+            
+            /* Background resets for print readability */
+            .bg-slate-900, .bg-slate-950, .bg-slate-800, .bg-blue-600, .bg-slate-800\/20, .bg-slate-800\/60, .bg-slate-800\/40 { 
+                background: white !important; 
+                border: 1pt solid #ccc !important; 
+                color: black !important; 
+                box-shadow: none !important;
+                border-radius: 4px !important;
+                margin-bottom: 15pt !important;
+            }
+            
+            /* Color overrides for high contrast */
+            .text-white, .text-slate-100, .text-slate-200, .text-slate-50, .text-slate-300, .text-slate-400, .text-slate-500, .text-blue-500 { 
+                color: black !important; 
+            }
+            
+            h1 { font-size: 32pt !important; border-bottom: 2pt solid black !important; margin-bottom: 20pt !important; font-weight: 800 !important; font-style: normal !important; }
+            h2 { font-size: 22pt !important; margin-top: 25pt !important; font-weight: 700 !important; }
+            h3, h4 { font-size: 16pt !important; margin-top: 15pt !important; font-weight: 700 !important; }
+            p { font-size: 11pt !important; line-height: 1.5 !important; margin-bottom: 8pt !important; }
+            
+            .grid { display: block !important; }
+            .shadow-2xl, .shadow-xl, .shadow-inner, .shadow-lg { box-shadow: none !important; }
+            
+            /* The print preview component uses its own carefully-crafted typography
+               (e.g. text-xs Tailwind labels for section headings). Undo the generic
+               h1-h4 size overrides above so they don't inflate those labels and cause
+               text clipping at the top of pages or orphaned headings on blank pages. */
+            #print-preview h1, #print-preview h2,
+            #print-preview h3, #print-preview h4 {
+                /*font-size: inherit !important;*/
+                /*font-weight: inherit !important;*/
+                padding-top: 20px !important;
+                padding-bottom: 20px !important;
+                margin: 0 !important;
+                border-bottom: none !important;
+                color: inherit !important;
+            }
+
+            /* Print preview mode: hide the whole app, show only the portal preview.
+               #print-preview is rendered as a sibling of #root (via React portal)
+               so display:none on #root does not affect it. */
+            body.print-preview-open #root { display: none !important; }
+            body.print-preview-open #print-preview {
+                position: static !important;
+                overflow: visible !important;
+                height: auto !important;
+                width: 100% !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}Import Session{% endblock %}
+
+{% block content %}
+<div class="pp-column">
+  <h1>Import Session</h1>
+
+  <form method="post" enctype="multipart/form-data" action="">
+    {% csrf_token %}
+
+    <fieldset style="margin-bottom:1em">
+      <legend>Import file</legend>
+      <input type="file" name="import_file" accept=".zip" required style="margin-bottom:0.5em" />
+      <p class="help" style="color:#666;font-size:0.85em">
+        Upload a session export ZIP produced by the "Download Export" button.
+      </p>
+    </fieldset>
+
+    <fieldset style="margin-bottom:1em">
+      <legend>Target user</legend>
+      <input
+        type="number"
+        name="target_user_id"
+        placeholder="User ID (e.g. 1)"
+        required
+        style="width:10em"
+      />
+      <p class="help" style="color:#666;font-size:0.85em">
+        The ID of the user who will own the imported session.
+        Find user IDs on the <a href="{% url 'admin:aiworks_core_user_changelist' %}">User page</a>.
+      </p>
+    </fieldset>
+
+    <div style="margin-top:1em">
+      <input type="submit" value="Import Session" class="default" />
+    </div>
+  </form>
+</div>
+{% endblock %}

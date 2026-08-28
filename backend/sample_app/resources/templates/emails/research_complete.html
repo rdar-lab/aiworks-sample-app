@@ -1,0 +1,23 @@
+{% extends "emails/base.html" %}
+{% block subject %}Your research report is ready{% endblock %}
+
+{% block content %}
+<h1>Your research report is ready</h1>
+<p>Hi {{ user.first_name|default:user.username }},</p>
+{% if session.session_title %}
+<p>Your in-depth research report <strong>"{{ session.session_title }}"</strong> is complete and ready to review.</p>
+{% else %}
+<p>Your in-depth research report is complete and ready to review.</p>
+{% endif %}
+
+{% if session_url %}
+<div class="btn-container">
+  <a class="btn" href="{{ session_url }}">View Report</a>
+</div>
+{% else %}
+<p>Log in to {{ app_name }} to view your report.</p>
+{% endif %}
+
+<hr class="divider" />
+<p style="font-size:13px;color:#888888;">Thank you for using {{ app_name }}.</p>
+{% endblock %}

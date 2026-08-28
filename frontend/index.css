@@ -1,0 +1,50 @@
+@import '@fontsource/plus-jakarta-sans/200.css';
+@import '@fontsource/plus-jakarta-sans/300.css';
+@import '@fontsource/plus-jakarta-sans/400.css';
+@import '@fontsource/plus-jakarta-sans/500.css';
+@import '@fontsource/plus-jakarta-sans/600.css';
+@import '@fontsource/plus-jakarta-sans/700.css';
+@import '@fontsource/plus-jakarta-sans/800.css';
+@import '@fontsource/plus-jakarta-sans/200-italic.css';
+@import '@fontsource/plus-jakarta-sans/300-italic.css';
+@import '@fontsource/plus-jakarta-sans/400-italic.css';
+@import '@fontsource/plus-jakarta-sans/500-italic.css';
+@import '@fontsource/plus-jakarta-sans/600-italic.css';
+@import '@fontsource/plus-jakarta-sans/700-italic.css';
+@import '@fontsource/plus-jakarta-sans/800-italic.css';
+
+@import 'tailwindcss';
+
+/* Pointer cursor on all interactive elements by default */
+button:not(:disabled),
+a,
+[role="button"]:not([aria-disabled="true"]),
+label[for],
+select:not(:disabled) {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* Safari / iOS: dvh unit fallback for iOS 15 and earlier which don't support dvh.
+   Using @supports so the optimizer won't strip the fallback declarations.
+   In browsers without dvh support, @supports not (height: 1dvh) evaluates to true
+   and the vh fallbacks are applied. Tailwind's dvh rules are simply ignored in
+   those same browsers, so there is no double-application. */
+@supports not (height: 1dvh) {
+  .h-dvh { height: 100vh; }
+  .min-h-dvh { min-height: 100vh; }
+  /* Arbitrary dvh height fallbacks used by chat/discussion containers */
+  .h-\[85dvh\] { height: 85vh; }
+  .max-h-\[85dvh\] { max-height: 85vh; }
+  .max-h-\[90dvh\] { max-height: 90vh; }
+  .max-h-\[70dvh\] { max-height: 70vh; }
+}
+
+/* Safelist for dynamic Tailwind classes loaded from the API/database at runtime.
+   Tailwind's static analysis cannot detect these, so we declare them explicitly. */
+@source inline("{bg,border}-{amber,blue,cyan,emerald,fuchsia,gray,green,indigo,lime,orange,pink,purple,red,rose,sky,slate,stone,teal,violet,yellow,zinc}-500/{10,20}");
+@source inline("text-{amber,blue,cyan,emerald,fuchsia,gray,green,indigo,lime,orange,pink,purple,red,rose,sky,stone,teal,violet,yellow,zinc}-400");
+@source inline("text-slate-100");

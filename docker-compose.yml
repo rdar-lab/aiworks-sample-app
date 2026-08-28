@@ -1,0 +1,158 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: aiworks-sample-db
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-aiworks_sample}
+      POSTGRES_USER: ${POSTGRES_USER:-aiworks_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aiworks_user} -d ${POSTGRES_DB:-aiworks_sample}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+
+  db_pool:
+    build:
+      context: ./db_pool
+      dockerfile: Dockerfile
+    container_name: aiworks-sample-db-pool
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-aiworks_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_POOL_SIZE=${DB_POOL_SIZE:-80}
+      - DB_POOL_MIN=${DB_POOL_MIN:-2}
+      - DB_POOL_CLIENT_TIMEOUT=${DB_POOL_CLIENT_TIMEOUT:-30}
+      - DB_POOL_IDLE_TIMEOUT=${DB_POOL_IDLE_TIMEOUT:-3600}
+      - DB_POOL_MAX_CLIENT_CONN=${DB_POOL_MAX_CLIENT_CONN:-80}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep pgbouncer"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    container_name: aiworks-sample-redis
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+
+  playwright-mcp:
+    image: mcr.microsoft.com/playwright/mcp
+    container_name: aiworks-sample-playwright-mcp
+    restart: always
+    environment:
+      - PLAYWRIGHT_MCP_HOST=0.0.0.0
+      - PLAYWRIGHT_MCP_PORT=8931
+      - PLAYWRIGHT_MCP_HEADLESS=true
+      - PLAYWRIGHT_MCP_NO_SANDBOX=true
+      - PLAYWRIGHT_MCP_ALLOWED_HOSTS=*
+      - PLAYWRIGHT_MCP_ISOLATED=true
+      - PLAYWRIGHT_MCP_BLOCKED_ORIGINS=http://0.0.0.0/8:*;http://10.0.0.0/8:*;http://100.64.0.0/10:*;http://127.0.0.0/8:*;http://169.254.0.0/16:*;http://172.16.0.0/12:*;http://192.0.0.0/24:*;http://192.0.2.0/24:*;http://192.168.0.0/16:*;http://198.18.0.0/15:*;http://198.51.100.0/24:*;http://203.0.113.0/24:*;http://224.0.0.0/4:*;http://240.0.0.0/4:*;http://255.255.255.255/32:*;http://localhost:*;https://localhost:*;http://[fc00::/7]:*;http://[fe80::/10]:*
+    networks:
+      - internal
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: aiworks-sample-backend
+    command: sh -c "python manage.py collectstatic --noinput && hypercorn aiworks_sample.asgi:application --bind 0.0.0.0:8000 -w 4 --graceful-timeout 600 --access-logfile -"
+    restart: always
+    volumes:
+      - storage:/storage
+    environment:
+      - DEBUG=${DEBUG:-False}
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-}
+      - JWT_SIGNING_KEY=${JWT_SIGNING_KEY:-}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-aiworks_user}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}@db_pool:5432/${POSTGRES_DB:-aiworks_sample}
+      - RUN_WATCHDOG=false
+      - REDIS_HOST=redis
+    depends_on:
+      db_pool:
+        condition: service_healthy
+    networks:
+      - internal
+
+  execution_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: aiworks-sample-worker
+    command: sh -c "python manage.py migrate && gunicorn aiworks_sample.wsgi:application --bind 127.0.0.1:8000 --workers 4 --timeout 600"
+    restart: always
+    volumes:
+      - storage:/storage
+    environment:
+      - DEBUG=${DEBUG:-False}
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-}
+      - JWT_SIGNING_KEY=${JWT_SIGNING_KEY:-}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-aiworks_user}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}@db_pool:5432/${POSTGRES_DB:-aiworks_sample}
+      - RUN_WATCHDOG=true
+      - REDIS_HOST=redis
+      - PLAYWRIGHT_MCP_ENABLED=${PLAYWRIGHT_MCP_ENABLED:-true}
+      - PLAYWRIGHT_MCP_URL=${PLAYWRIGHT_MCP_URL:-http://playwright-mcp:8931/mcp}
+    depends_on:
+      db_pool:
+        condition: service_healthy
+    networks:
+      - internal
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: aiworks-sample-frontend
+    restart: always
+    depends_on:
+      - backend
+    networks:
+      - internal
+
+  proxy:
+    build:
+      context: ./proxy
+      dockerfile: Dockerfile
+    container_name: aiworks-sample-proxy
+    restart: always
+    ports:
+      - "8085:80"
+    depends_on:
+      backend:
+        condition: service_started
+      frontend:
+        condition: service_started
+    networks:
+      - internal
+      - web-proxy
+
+volumes:
+  postgres_data:
+  storage:
+
+networks:
+  web-proxy:
+    external: true
+  internal:
+    driver: bridge

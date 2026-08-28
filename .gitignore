@@ -1,0 +1,83 @@
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+test_db.sqlite3
+test_db.sqlite3-journal
+/media
+/staticfiles
+/static
+/CACHE
+
+# Storage (bind mounts)
+storage/
+test_storage/
+backend/logs/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+
+# Virtual environments
+.venv/
+venv/
+env/
+.env
+.env.local
+
+# aiworks-core venv (when opened via symlink)
+aiworks_core.venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+.tox/
+.nox/
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Ruff
+.ruff_cache/
+
+# Distribution / packaging
+*.manifest
+*.spec
+
+# Local configuration (secrets)
+*.local
+config.json
+credentials.json
+
+# Environment files (keep .env.example)
+.env
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+db.sqlite3-shm
+db.sqlite3-wal
