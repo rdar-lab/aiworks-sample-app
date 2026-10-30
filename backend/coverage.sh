@@ -88,7 +88,7 @@ echo
 # Run tests with coverage
 echo -e "${GREEN}Running tests with coverage analysis...${NC}"
 echo
-if python3 -m coverage run --source='api' manage.py test api; then
+if python3 -m coverage run --source=sample_app -m pytest tests/ -q; then
     echo
     echo -e "${GREEN}✓ Tests completed successfully${NC}"
 else

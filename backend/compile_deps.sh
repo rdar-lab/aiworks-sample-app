@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
-python -m pip install --upgrade pip uv
+# Use uv's own pip interface — a venv created with `uv venv` has no pip
+# module, so `python -m pip` fails before anything is installed.
+uv pip install --upgrade pip uv
 
 if [[ "${1:-}" == "upgrade" ]]; then
     UV_FLAGS="-U"
