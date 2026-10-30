@@ -1,5 +1,16 @@
 # Core dependencies
--e ../../aiworks-core
+#
+# aiworks-core is the shared library this app is built on. The Git URL is used
+# instead of a local `-e ../../aiworks-core` path because the relative path
+# escapes the Docker build context and cannot be resolved inside the image.
+#
+# This tracks the `main` branch, so a rebuild picks up upstream changes.
+# Pin to a commit SHA (…/aiworks-core.git@<sha>) for reproducible builds.
+#
+# To develop against a local checkout of aiworks-core, put it first on the
+# import path — it takes precedence over the installed copy:
+#     export PYTHONPATH=/path/to/aiworks-core
+aiworks-core @ git+https://github.com/rdar-lab/aiworks-core.git@main
 Django>=6.0
 djangorestframework>=3.16
 djangorestframework-simplejwt>=5.5

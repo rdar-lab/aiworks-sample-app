@@ -16,7 +16,13 @@ trap cleanup EXIT
 
 echo "Starting backend (Django)..."
 cd backend
-source venv/bin/activate
+
+# Use backend/venv when it exists, otherwise fall back to the ambient Python
+# environment that install_deps.sh populates.
+if [ -f venv/bin/activate ]; then
+    source venv/bin/activate
+fi
+
 setsid python manage.py runserver &
 BACKEND_PG=$!
 cd ..

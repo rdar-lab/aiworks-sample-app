@@ -10,7 +10,7 @@ A comprehensive AI-powered research application built on aiworks-core with regis
 - **Research Sessions**: AI-powered research with daily limits
 - **Knowledge Bases**: Upload and manage documents for research
 - **MCP Integration**: Connect to MCP servers for extended capabilities
-- **Tier System**: Free tier (3 research/day) and Pro tier (unlimited)
+- **Tier System**: Free tier and Pro tier, with configurable daily research limits (defaults: 0/day free, 5/day pro)
 
 ---
 
@@ -20,6 +20,13 @@ A comprehensive AI-powered research application built on aiworks-core with regis
 
 - Docker and Docker Compose
 - Python 3.12+ (for local development)
+
+The stack attaches to an externally-managed Docker network named `web-proxy`.
+Create it once before the first start:
+
+```bash
+docker network create web-proxy
+```
 
 ### Deployment with Docker Compose
 
@@ -38,7 +45,7 @@ A comprehensive AI-powered research application built on aiworks-core with regis
    docker-compose up --build
    ```
 
-   The app will be available at http://localhost:8085
+   The app will be available at http://localhost:8085/app/
 
 3. **Run migrations on first start:**
 
@@ -61,10 +68,18 @@ A comprehensive AI-powered research application built on aiworks-core with regis
    cp .env.example .env
 
    # Run migrations
-   PYTHONPATH=/home/xmaster/aiworks-core python manage.py migrate aiworks_core
+   python manage.py migrate aiworks_core
 
    # Start server
-   PYTHONPATH=/home/xmaster/aiworks-core python manage.py runserver
+   python manage.py runserver
+   ```
+
+   `aiworks-core` is installed from Git (see `backend/requirements.in`). To work
+   against a local checkout of it instead, put that checkout first on the
+   import path — it takes precedence over the installed copy:
+
+   ```bash
+   export PYTHONPATH=/path/to/aiworks-core
    ```
 
 2. **Start both services:**
@@ -79,12 +94,26 @@ A comprehensive AI-powered research application built on aiworks-core with regis
    ```bash
    # Backend
    cd backend
-   PYTHONPATH=/home/xmaster/aiworks-core python manage.py runserver
+   python manage.py runserver
 
    # Frontend (in another terminal)
    cd frontend
    npm run dev
    ```
+
+---
+
+## Desktop CLI
+
+`desktop/cli/` is a standalone Node.js CLI that opens a WebSocket tunnel to the
+cloud so that MCP servers running on your machine can be attached to a session.
+See [`desktop/cli/README.md`](desktop/cli/README.md) for installation and usage.
+
+```bash
+cd desktop/cli
+npm ci && npm run build
+DESKTOP_CLI_API_URL=http://localhost:8085 node dist/main.js
+```
 
 ---
 
@@ -123,8 +152,8 @@ aiworks-sample-app/
 ├── backend/
 │   ├── aiworks_sample/       # Django project settings
 │   ├── sample_app/           # Custom app (models, hooks, serializers)
-│   ├── tests/                # Unit and integration tests
-│   ├── prompts.yaml          # Prompt templates
+│   │   ├── logic/            # App-specific executor/session/email logic
+│   │   └── resources/        # Prompt templates and HTML templates
 │   ├── requirements.in       # Production dependencies
 │   ├── requirements-dev.in   # Development dependencies
 │   ├── requirements.txt      # Compiled dependencies
@@ -136,18 +165,31 @@ aiworks-sample-app/
 │   ├── Dockerfile
 │   └── manage.py
 ├── frontend/
-│   ├── src/                  # React source
+│   ├── components/           # Shared React components
+│   ├── contexts/             # React context providers
+│   ├── hooks/                # Custom hooks
+│   ├── pages/                # Page components
+│   ├── services/             # API client and service layer
+│   ├── utils/                # Shared utilities
 │   ├── public/               # Static assets
+│   ├── App.tsx               # Router and app shell
+│   ├── index.tsx             # React entry point
 │   ├── index.html
 │   ├── vite.config.ts        # Vite configuration
 │   ├── package.json
 │   ├── tsconfig.json
-│   ├── nginx.conf            # Production nginx config
-│   ├── dev.sh                # Local development script
-│   └── README.md
+│   └── nginx.conf            # Production nginx config
+├── desktop/
+│   └── cli/                  # Node CLI — exposes local MCP servers over a tunnel
+├── db_pool/                  # PgBouncer connection pool image
+│   ├── Dockerfile
+│   ├── pgbouncer.ini.tpl
+│   ├── userlist.txt.tpl
+│   └── pgbouncer-entrypoint.sh
 ├── proxy/
 │   ├── nginx.conf            # Reverse proxy config
 │   └── Dockerfile
+├── dev.sh                    # Run backend + frontend locally
 ├── docker-compose.yml         # Docker services
 ├── .env.example              # Environment template (root)
 └── README.md                 # This file
@@ -167,7 +209,7 @@ docker-compose exec backend pytest tests/ -v
 
 ```bash
 cd backend
-PYTHONPATH=/home/xmaster/aiworks-core pytest tests/ -v
+pytest tests/ -v
 ```
 
 ### With Coverage:
@@ -187,28 +229,48 @@ All API endpoints are available under `/api/`.
 
 | Method | Path | Description |
 |--------|------|-------------|
-| POST | `/register/` | Register new user |
-| POST | `/login/` | Login and get JWT tokens |
-| POST | `/refresh/` | Refresh access token |
-| GET | `/me/` | Current user info |
-| POST | `/verify/` | Verify email |
-| POST | `/password/reset/` | Request password reset |
-| POST | `/password/reset/confirm/` | Confirm password reset |
+| POST | `/api/auth/register/` | Register new user |
+| POST | `/api/auth/verify-email/` | Verify email |
+| POST | `/api/auth/login/` | Login and get JWT tokens |
+| POST | `/api/auth/logout/` | Logout |
+| POST | `/api/auth/refresh/` | Refresh access token |
+| GET | `/api/auth/me/` | Current user info |
+| POST | `/api/auth/password-reset/` | Request password reset |
+| POST | `/api/auth/password-reset/confirm/` | Confirm password reset |
+| POST | `/api/auth/google/` | Google OAuth sign-in |
 
 ### Resources (`/api/`)
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET/POST | `/knowledge-bases/` | List/create knowledge bases |
-| GET/PUT/DELETE | `/knowledge-bases/<id>/` | KB detail operations |
-| POST | `/knowledge-bases/<id>/upload_files/` | Upload files to KB |
-| GET/POST | `/mcp-servers/` | List/create MCP servers |
-| GET/PUT/DELETE | `/mcp-servers/<id>/` | MCP server detail |
-| GET | `/memory/` | List memory entries |
-| DELETE | `/memory/<id>/` | Delete memory entry |
+| GET | `/api/server-settings/` | Public server settings (Google client id, etc.) |
+| GET/POST | `/api/knowledge-bases/` | List/create knowledge bases |
+| GET/PUT/DELETE | `/api/knowledge-bases/<id>/` | KB detail operations |
+| POST | `/api/knowledge-bases/<id>/upload_files/` | Upload files to KB |
+| GET | `/api/predefined-mcp-servers/` | Admin-managed MCP server catalogue |
+| GET/POST | `/api/mcp-servers/` | List/create MCP servers |
+| GET/PUT/DELETE | `/api/mcp-servers/<id>/` | MCP server detail |
+| POST | `/api/mcp-servers/discover-oauth/` | Probe a server for OAuth 2.1 metadata |
+| POST | `/api/mcp-servers/oauth-exchange/` | Exchange an OAuth code for a token |
+| GET/POST | `/api/sessions/` | List/create sessions |
+| GET/PUT/DELETE | `/api/sessions/<id>/` | Session detail operations |
+| GET | `/api/memory/` | List memory entries |
+| POST | `/api/memory/import/` | Import memory entries |
+| DELETE | `/api/memory/<id>/` | Delete memory entry |
+| GET | `/api/notifications/` | List notifications |
+| POST | `/api/help-chat/` | Help chat |
+| GET/POST | `/api/mcp-tunnel/` | Desktop MCP tunnel connect / list |
+| POST | `/api/mcp-tunnel/<tunnel_id>/claim/` | Claim a tunnel for a user |
+| GET | `/api/mcp-tunnel/<tunnel_id>/servers/` | Tunnel server list |
+| GET | `/api/mcp-tunnel/<tunnel_id>/tools/` | Tunnel tool manifest |
 
 ---
 
 ## Integrating aiworks-core
 
-See [AGENTS.md](https://github.com/your-org/aiworks-core/blob/main/AGENTS.md) in the aiworks-core repository for a complete integration checklist.
+`aiworks-core` is installed from Git — see `backend/requirements.in`. It is
+tracked on the `main` branch; pin the URL to a commit SHA for reproducible
+builds.
+
+See [AGENTS.md](https://github.com/rdar-lab/aiworks-core/blob/main/AGENTS.md)
+in the aiworks-core repository for a complete integration checklist.
