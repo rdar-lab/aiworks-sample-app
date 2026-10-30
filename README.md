@@ -60,6 +60,12 @@ docker network create web-proxy
    ```bash
    cd backend
 
+   # Create a virtualenv — one of:
+   uv venv venv                # if uv is already installed
+   # python -m venv venv       # otherwise — install_deps.sh bootstraps uv
+
+   source venv/bin/activate
+
    # Install dependencies
    ./install_deps.sh
    # or manually: uv pip sync --torch-backend=cpu requirements-dev.txt
@@ -73,6 +79,15 @@ docker network create web-proxy
    # Start server
    python manage.py runserver
    ```
+
+   If `uv` isn't installed yet, install it once with:
+
+   ```bash
+   python -m pip install uv
+   ```
+
+   `install_deps.sh` and `compile_deps.sh` bootstrap `uv` themselves when it is
+   missing, so a plain `python -m venv venv` environment works too.
 
    `aiworks-core` is installed from Git (see `backend/requirements.in`). To work
    against a local checkout of it instead, put that checkout first on the
@@ -208,7 +223,7 @@ library behaviour is covered by aiworks-core's own suite.
 cd backend
 
 # Create a virtualenv and install the dev dependencies
-uv venv venv
+uv venv venv                # or: python -m venv venv
 source venv/bin/activate
 ./install_deps.sh
 
