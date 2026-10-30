@@ -199,23 +199,33 @@ aiworks-sample-app/
 
 ## Running Tests
 
+The test suite runs against the host app's own layer (`sample_app`). The shared
+library behaviour is covered by aiworks-core's own suite.
+
+### Locally:
+
+```bash
+cd backend
+
+# Create a virtualenv and install the dev dependencies
+uv venv venv
+source venv/bin/activate
+./install_deps.sh
+
+pytest tests/ -v
+```
+
 ### With Docker:
 
 ```bash
 docker-compose exec backend pytest tests/ -v
 ```
 
-### Locally:
-
-```bash
-cd backend
-pytest tests/ -v
-```
-
 ### With Coverage:
 
 ```bash
 cd backend
+source venv/bin/activate   # if not already active
 ./coverage.sh --all
 ```
 
