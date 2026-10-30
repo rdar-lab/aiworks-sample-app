@@ -136,21 +136,35 @@ DESKTOP_CLI_API_URL=http://localhost:8085 node dist/main.js
 
 ### Root `.env` (Docker Compose)
 
-| Variable | Description |
-|----------|-------------|
-| `POSTGRES_DB` | PostgreSQL database name |
-| `POSTGRES_USER` | PostgreSQL user |
-| `POSTGRES_PASSWORD` | PostgreSQL password |
-| `DEBUG` | Django debug mode |
-| `DJANGO_SECRET_KEY` | Django secret key |
-| `JWT_SIGNING_KEY` | JWT signing key |
-| `ALLOWED_HOSTS` | Django allowed hosts |
-| `AIWORKS_CORE_APP_NAME` | Application name |
-| `AIWORKS_CORE_SITE_URL` | Site URL for emails |
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `POSTGRES_DB` | `aiworks_sample` | PostgreSQL database name |
+| `POSTGRES_USER` | `aiworks_user` | PostgreSQL user |
+| `POSTGRES_PASSWORD` | — | PostgreSQL password (required) |
+| `DEBUG` | `False` | Django debug mode |
+| `DJANGO_SECRET_KEY` | — | Django secret key |
+| `JWT_SIGNING_KEY` | — | JWT signing key (falls back to the Django secret) |
+| `ALLOWED_HOSTS` | `localhost,127.0.0.1` | Django allowed hosts |
+| `DB_POOL_SIZE` | `80` | PgBouncer max server connections per pool |
+| `DB_POOL_MIN` | `2` | PgBouncer minimum idle server connections |
+| `DB_POOL_CLIENT_TIMEOUT` | `30` | PgBouncer server connect timeout (seconds) |
+| `DB_POOL_IDLE_TIMEOUT` | `3600` | PgBouncer server idle timeout (seconds) |
+| `DB_POOL_MAX_CLIENT_CONN` | `80` | PgBouncer maximum client connections |
 
 ### Backend `.env`
 
 Contains the same variables as the root `.env` for local development.
+
+### Site configuration
+
+The site URL, Google OAuth credentials, email delivery and the LLM provider
+settings are **not** environment variables — they live in singleton records
+edited from the Django admin (`/admin/`):
+
+| Admin object | Holds |
+|---|---|
+| **Site Configuration** | Site URL, Google client id/secret, email backend, cold storage, CSRF origins |
+| **LLM Configuration** | Provider, model names, API keys, per-operation overrides |
 
 ### Frontend `.env`
 
