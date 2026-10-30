@@ -103,6 +103,20 @@ docker network create web-proxy
 
 ---
 
+## Desktop CLI
+
+`desktop/cli/` is a standalone Node.js CLI that opens a WebSocket tunnel to the
+cloud so that MCP servers running on your machine can be attached to a session.
+See [`desktop/cli/README.md`](desktop/cli/README.md) for installation and usage.
+
+```bash
+cd desktop/cli
+npm ci && npm run build
+DESKTOP_CLI_API_URL=http://localhost:8085 node dist/main.js
+```
+
+---
+
 ## Configuration
 
 ### Root `.env` (Docker Compose)
