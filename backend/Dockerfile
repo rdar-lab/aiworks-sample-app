@@ -7,6 +7,8 @@ ENV PYTHONUNBUFFERED=1
 # Install WeasyPrint system dependencies (GTK/Pango stack for PDF rendering)
 # Install FFmpeg for video processing (MoviePy requires FFmpeg for encoding/decoding)
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    git \
     libgobject-2.0-0 \
     libpango-1.0-0 \
     libpangocairo-1.0-0 \
