@@ -1,6 +1,6 @@
 # AiWorks Sample App CLI
 
-A standalone Node.js CLI that establishes a persistent WebSocket tunnel to the AiWorks Sample App cloud, enabling your local MCP servers to be used in advisory board sessions.
+A standalone Node.js CLI that establishes a persistent WebSocket tunnel to the AiWorks Sample App cloud, enabling your local MCP servers to be used in research sessions.
 
 ## Prerequisites
 

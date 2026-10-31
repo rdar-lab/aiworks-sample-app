@@ -59,7 +59,7 @@ def research_context(
 class ResearchExecutor(WorkerExecutor):
     """Encapsulates the research lifecycle for a research-report session.
 
-    Runs the deep research agent (same as DeliberationExecutor's research step)
+    Runs the deep research agent over the session's topic
     and stores the resulting Markdown report in ``session.agent_result``.
     No board selection, advisor advice, or synthesis is performed.
 

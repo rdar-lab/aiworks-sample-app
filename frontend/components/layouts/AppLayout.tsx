@@ -224,8 +224,8 @@ Finally, complete the sentence "My AI name is: <name>", where name is ChatGPT, C
             AI<span className="text-blue-500">Works</span>
           </span>
                     <span className="min-[390px]:hidden font-bold text-lg tracking-tighter uppercase">
-            <span className={lightMode ? 'text-slate-900' : 'text-white'}>P</span><span
-                        className="text-blue-500">B</span>
+            <span className={lightMode ? 'text-slate-900' : 'text-white'}>A</span><span
+                        className="text-blue-500">W</span>
           </span>
                 </div>
 

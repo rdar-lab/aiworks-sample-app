@@ -51,7 +51,7 @@ logger = logging.getLogger(__name__)
 
 
 class SessionViewSet(viewsets.ModelViewSet):
-    """ViewSet for managing advisory board sessions"""
+    """ViewSet for managing research sessions"""
 
     serializer_class = SessionSerializer
     permission_classes = [IsAuthenticated]
@@ -612,11 +612,11 @@ class SessionViewSet(viewsets.ModelViewSet):
         """
         Reset a completed session and re-run it. Unified handler for all session types.
 
-        - Deliberation: Summarizes board findings into prev_session, clears advice/synthesis/chat.
+        - Research: Summarizes findings into prev_session, clears advice/synthesis/chat.
         - Research/Communication: Copies report to prev_agent_result, clears report.
 
         Accepts ``additionalUserComments``:
-          - For deliberation: optional extra context to append
+          - For research: optional extra context to append
           - For research/communication: required refinement notes
 
         For research/branding/website/dashboard/task sessions, also accepts:

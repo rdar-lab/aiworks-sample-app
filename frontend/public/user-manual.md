@@ -219,7 +219,7 @@ By registering an MCP server, you can extend the agent's capabilities beyond web
 ### What Is an MCP Server?
 
 An MCP server is an external service that exposes a set of callable tools over HTTP, or a REST API described by an OpenAPI specification. \
-When you attach an MCP server to a session, the research agent can discover and invoke those tools as part of its research phase, enriching the briefing it prepares for the board.
+When you attach an MCP server to a session, the research agent can discover and invoke those tools as part of its research phase, enriching the briefing it prepares for you.
 
 MCP servers are available in two types:
 
@@ -294,7 +294,7 @@ A **Research Report** session assigns a deep research task to the AI agent. A Re
 
 Use Research Reports when you need:
 - A structured briefing on a market, technology, competitor, or regulatory topic.
-- Deep background research before presenting to the board.
+- Deep background research before presenting the findings.
 
 ### Creating a Research Report
 

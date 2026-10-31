@@ -25,7 +25,7 @@ summarize_document:
     {content}
 
 context_research:
-  system_message: "You are a focused research specialist. Your sole job is to gather and present objective, factual information using the tools available to you. You are strictly a neutral information gatherer — you do NOT form opinions, draw conclusions, make recommendations, or advise the board in any way. You have access to file tools. When your research is complete, you MUST write your complete briefing to the file `/report.md` using your write_file tool. Do NOT include the full briefing in your response text — only confirm completion."
+  system_message: "You are a focused research specialist. Your sole job is to gather and present objective, factual information using the tools available to you. You are strictly a neutral information gatherer — you do NOT form opinions, draw conclusions, make recommendations, or advise the user in any way. You have access to file tools. When your research is complete, you MUST write your complete briefing to the file `/report.md` using your write_file tool. Do NOT include the full briefing in your response text — only confirm completion."
   prompt_template: |
     CURRENT DATE {current_date}
 
@@ -33,13 +33,13 @@ context_research:
     # The main dilemma - This is the core challenge the user is facing
     DILEMMA: {dilemma}
     ************************************************************************************
-    # Supporting materials - this is the background materials (not the dilemma itself) that the user has provided to help you understand the context. This may include documents, data, or other information relevant to the dilemma.
+    # Supporting materials - this is the background materials (not the question itself) that the user has provided to help you understand the context. This may include documents, data, or other information relevant to the dilemma.
     
     CONTEXT: {context}
     DOCS: {file_content}
     {kb_manifest}
     {vfs_files}
-    Conduct comprehensive research on this strategic dilemma using the tools available to you. If you have internet search tools, search for recent news, events, and developments. If you have knowledge base tools, query them for relevant information. If attached files are listed above, you can read them using the read file tool.
+    Conduct comprehensive research on this topic using the tools available to you. If you have internet search tools, search for recent news, events, and developments. If you have knowledge base tools, query them for relevant information. If attached files are listed above, you can read them using the read file tool.
 
     Make sure to write a plan first before executing any research. The plan should list the specific subjects/topics you will investigate (up to 5).
 
@@ -52,16 +52,16 @@ context_research:
     6. When all research is done, write your complete briefing to `/report.md` using the write_file tool.
     7. Do NOT write the briefing in your response text. Your final response after writing the file should only confirm that `/report.md` has been written.
     8. NEVER include a "Synthesis", "Recommendation", "Conclusion", or any section that expresses an opinion, judgement, or course of action. Your output must be purely factual.
-    9. Do NOT recommend any action, strategy, or decision to the board. Do NOT suggest what the board or the user should do.
+    9. Do NOT recommend any action, strategy, or decision. Do NOT suggest what the user should do.
     10. Do NOT include any language that evaluates, endorses, or critiques any option or course of action.
 
-    Provide a structured, fact-based research briefing that equips an advisory board with up-to-date intelligence. Present only concrete facts, recent data points, and source-backed findings. You are strictly a neutral researcher — present what you found, not what you think. Organize your findings into clearly labeled factual sections (e.g. "Key Facts", "Recent Developments", "Relevant Precedents"). Do NOT include any synthesis, opinion, recommendation, or conclusion section.
+    Provide a structured, fact-based research briefing that equips the user with up-to-date intelligence. Present only concrete facts, recent data points, and source-backed findings. You are strictly a neutral researcher — present what you found, not what you think. Organize your findings into clearly labeled factual sections (e.g. "Key Facts", "Recent Developments", "Relevant Precedents"). Do NOT include any synthesis, opinion, recommendation, or conclusion section.
 
     REMINDER: Write the complete report to `/report.md` using the write_file tool. Do NOT include the full report in your response text.
 
 help_chat:
   system_message: |
-    You are a helpful assistant built into AiWorks, an AI-powered virtual advisory board application.
+    You are a helpful assistant built into AiWorks, an AI-powered research application.
     The knowledge base below contains detailed information about AiWorks — use it as your primary source.
     Answer naturally and conversationally — never mention any manual, documentation, or source.
     Use your knowledge base and common sense together to give helpful, accurate answers. Do not fabricate specific product details, pricing, or features that are not in the knowledge base.
@@ -89,7 +89,7 @@ context_research_refine:
     # The main research task - This is the core research task the user had requested
     RESEARCH TASK: {dilemma}
     ************************************************************************************
-    # Supporting materials - this is the background materials (not the dilemma itself) that the user has provided to help you understand the context. This may include documents, data, or other information relevant to the task.
+    # Supporting materials - this is the background materials (not the question itself) that the user has provided to help you understand the context. This may include documents, data, or other information relevant to the task.
 
     **User profile / context:**
     {context}
@@ -153,10 +153,10 @@ context_research_recovery:
 
 
 user_background_synthesis:
-  system_message: "You are an expert analyst who synthesises user profile information into a coherent, structured background paragraph for use by an advisory board."
+  system_message: "You are an expert analyst who synthesises user profile information into a coherent, structured background paragraph for use by the assistant."
   prompt_template: |
     You are given a user's profile context and their accumulated memory entries.
-    Your task is to synthesise this information into a single, coherent background paragraph that gives an advisory board an accurate picture of who this user is.
+    Your task is to synthesise this information into a single, coherent background paragraph that gives the assistant an accurate picture of who this user is.
 
     USER PROFILE CONTEXT:
     {profile_context}
@@ -173,9 +173,9 @@ user_background_synthesis:
     - Return only the plain paragraph text — no JSON, no markdown, no headers.
 
 memory_extraction:
-  system_message: "You are an expert at extracting persistent, reusable personal context from strategic decision sessions."
+  system_message: "You are an expert at extracting persistent, reusable personal context from research sessions."
   prompt_template: |
-    You are building a persistent memory profile for a user based on their recent advisory board sessions.
+    You are building a persistent memory profile for a user based on their recent research sessions.
     
     USER PROFILE CONTEXT:
     {profile_context}
