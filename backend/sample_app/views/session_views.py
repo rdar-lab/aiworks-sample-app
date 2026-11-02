@@ -388,7 +388,7 @@ class SessionViewSet(viewsets.ModelViewSet):
         queryset = AppSession.objects.filter(
             id__in=favorite_ids,
             is_deleted=False,
-        ).prefetch_related("worker_task", "clarifying_questions")
+        ).prefetch_related("worker_task")
         sessions = list(queryset.order_by("-updated_at", "-id"))
         serializer = SessionListSerializer(sessions, many=True, context={"request": request})
         return Response({
